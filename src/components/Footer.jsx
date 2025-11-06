@@ -1,40 +1,83 @@
 import React from 'react';
+import { siteCopy } from '../content/siteData';
 
 export default function Footer() {
+  const { hero, footer } = siteCopy;
+  const {
+    attorneys,
+    services,
+    navLinks,
+    designCredit,
+    legalNotice,
+    address,
+    copyright,
+  } = footer;
+
+  const navigationItems = navLinks.filter((item) => !/client services/i.test(item.label));
+  const clientServicesLink = navLinks.find((item) => /client services/i.test(item.label));
+
   return (
-    <footer className="bg-white border-t border-gray-200 py-8 md:py-12 lg:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="space-y-4 md:space-y-6">
-            <p className="text-gray-700 font-medium text-lg md:text-xl">Services</p>
-            <ul className="space-y-2 text-gray-600 text-base md:text-lg">
-              <li>Corporate Litigation</li>
-              <li>Commercial Legal Services</li>
+    <footer className="bg-slate-950 text-white">
+      <div className="max-w-7xl mx-auto px-6 py-16 md:px-10">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-4">
+            {hero.title && (
+              <p className="text-2xl font-semibold">{hero.title}</p>
+            )}
+            {address && <p className="max-w-xs text-sm text-white/70">{address}</p>}
+            {copyright && <p className="text-xs uppercase tracking-wider text-white/50">{copyright}</p>}
+          </div>
+
+          {attorneys.length > 0 && (
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-white/60">Attorneys</p>
+              <ul className="mt-4 space-y-3 text-white/80">
+                {attorneys.map((name) => (
+                  <li key={name}>{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-white/60">Client Services</p>
+            <ul className="mt-4 space-y-3 text-white/80">
+              {services.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+              {clientServicesLink && (
+                <li>
+                  <a
+                    href={clientServicesLink.url}
+                    className="inline-flex items-center gap-2 text-sm uppercase tracking-wide text-secondary hover:text-white"
+                  >
+                    {clientServicesLink.label}
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 
-          <div className="space-y-4 md:space-y-6">
-            <p className="text-gray-700 font-medium text-lg md:text-xl">Attorneys</p>
-            <ul className="space-y-2 text-gray-600 text-base md:text-lg">
-              <li>John Doe</li>
-              <li>Jane Smith</li>
-              <li>Michael Johnson</li>
-            </ul>
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-white/60">Navigation</p>
+            <nav className="mt-4 flex flex-col space-y-3 text-white/80">
+              {navigationItems.map((link) => (
+                <a key={link.label} href={link.url} className="hover:text-white">
+                  {link.label}
+                </a>
+              ))}
+              {designCredit && designCredit.url && (
+                <a href={designCredit.url} className="hover:text-white">
+                  {designCredit.label}
+                </a>
+              )}
+              {legalNotice && legalNotice.url && (
+                <a href={legalNotice.url} className="hover:text-white">
+                  {legalNotice.label}
+                </a>
+              )}
+            </nav>
           </div>
-
-          <div className="space-y-4 md:space-y-6">
-            <p className="text-gray-700 font-medium text-lg md:text-xl">Quick Links</p>
-            <ul className="space-y-2 text-gray-600 text-base md:text-lg">
-              <li><a href="#" className="hover:text-primary transition-colors duration-200">Home</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors duration-200">About</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors duration-200">Contact</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mt-8 md:mt-12 lg:mt-16 flex items-center justify-between text-gray-600 text-sm md:text-base">
-          <span>© 2023 Scorpion Design. All rights reserved.</span>
-          <a href="http://www.scorpiondesign.com/" className="hover:text-primary transition-colors duration-200">Scorpion Design</a>
         </div>
       </div>
     </footer>
