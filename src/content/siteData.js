@@ -1,9 +1,68 @@
 import siteDataRaw from '/site_data.md?raw';
 
+const extractFirstJsonObject = (input = '') => {
+  const trimmed = input.trim();
+  if (!trimmed.startsWith('{')) {
+    return '';
+  }
+
+  let depth = 0;
+  let inString = false;
+  let isEscaped = false;
+
+  for (let index = 0; index < trimmed.length; index += 1) {
+    const character = trimmed[index];
+
+    if (inString) {
+      if (isEscaped) {
+        isEscaped = false;
+      } else if (character === '\\') {
+        isEscaped = true;
+      } else if (character === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (character === '"') {
+      inString = true;
+      continue;
+    }
+
+    if (character === '{') {
+      depth += 1;
+    } else if (character === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        return trimmed.slice(0, index + 1);
+      }
+    }
+  }
+
+  return '';
+};
+
 const safeParse = (input) => {
+  if (typeof input !== 'string') {
+    return {};
+  }
+
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return {};
+  }
+
   try {
-    return JSON.parse(input);
+    return JSON.parse(trimmed);
   } catch (error) {
+    const candidate = extractFirstJsonObject(trimmed);
+    if (candidate) {
+      try {
+        return JSON.parse(candidate);
+      } catch (nestedError) {
+        console.warn('Unable to parse extracted site data:', nestedError);
+      }
+    }
     console.warn('Unable to parse site data:', error);
     return {};
   }
@@ -33,7 +92,7 @@ const markdownLines = markdownContent
 
 const imageEntries = [];
 for (const line of markdownLines) {
-  const imageMatches = line.matchAll(/!\[(.*?)\]\((.*?)\)/g);
+  const imageMatches = line.matchAll(/!\[(.*?)\](?:\((.*?)\))?/g);
   for (const match of imageMatches) {
     imageEntries.push({
       alt: sanitizeText(match[1] ?? ''),
@@ -75,6 +134,14 @@ const narrative = {
   closing: longFormParagraphs.slice(-1),
 };
 
+const steerMatch = (narrative.overview[0] ?? '').match(
+  /steer clients through the infinite grey areas confronting their business every day\.?/i
+);
+
+const heroTagline = steerMatch
+  ? `Steering ${sanitizeText(steerMatch[0]).replace(/^steer\s+/i, '')}`
+  : 'Business-Focused Counsel';
+
 const referenceMap = {};
 referencesContent
   .split('\n')
@@ -106,6 +173,10 @@ const navLinks = navMatches.map((match) => {
 const designCredit = navLinks.find((item) => /scorpion design/i.test(item.label));
 const legalNotice = navLinks.find((item) => /legal notice/i.test(item.label));
 
+const addressReference = Object.values(referenceMap).find((item) =>
+  /grey street legal/i.test(item.label ?? '')
+);
+
 const primaryNavLinks = navLinks.filter((item) =>
   !/scorpion design|legal notice/i.test(item.label)
 );
@@ -132,6 +203,7 @@ export const siteCopy = {
     title: heroTitle,
     subtitle: heroSubtitle,
     intro: narrative.intro,
+    tagline: heroTagline,
     ctas: contactLink && contactLink.label
       ? [
           {
@@ -172,7 +244,7 @@ export const siteCopy = {
     navLinks: primaryNavLinks,
     designCredit: designCredit ?? null,
     legalNotice: legalNotice ?? null,
-    address: addressImage ? addressImage.alt : '',
+    address: addressImage?.alt || addressReference?.label || '',
     copyright: copyrightLine,
   },
   images: imageEntries,

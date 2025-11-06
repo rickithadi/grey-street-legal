@@ -2,7 +2,7 @@ import React from 'react';
 import { siteCopy } from '../content/siteData';
 
 const Hero = () => {
-  const { title, subtitle, intro, ctas, image, gallery, attorneys } = siteCopy.hero;
+  const { title, subtitle, intro, ctas, image, gallery, attorneys, tagline } = siteCopy.hero;
 
   const supportingImages = gallery
     .filter((item) => item.src !== image?.src)
@@ -14,9 +14,13 @@ const Hero = () => {
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-16 px-6 py-24 md:px-10 md:py-28">
         <div className="space-y-8">
           {title && (
-            <div>
-              <p className="uppercase tracking-[0.3em] text-xs md:text-sm text-white/70">Business-Focused Counsel</p>
-              <h1 className="mt-4 text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
+            <div className="space-y-4">
+              {tagline && (
+                <p className="text-sm md:text-base font-medium text-white/70">
+                  {tagline}
+                </p>
+              )}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
                 {title}
               </h1>
             </div>

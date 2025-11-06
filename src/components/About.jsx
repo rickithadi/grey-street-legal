@@ -1,13 +1,28 @@
 import React from 'react';
 import { siteCopy } from '../content/siteData';
 
-const billingModelText = 'Grey Street Legal utilizes a unique and flexible billing model that provides the advantages of a large traditional law firm with those of a dedicated in-house legal staff, without the costs and inefficiencies associated with conventional legal service arrangements.';
-
 const About = () => {
   const { heading, paragraphs } = siteCopy.about;
   const { services } = siteCopy;
 
-  const primaryParagraphs = paragraphs.length > 0 ? paragraphs : [];
+  const overviewParagraph = paragraphs[0] ?? '';
+
+  const billingSentenceMatch = overviewParagraph.match(
+    /Grey Street Legal utilizes a unique and flexible billing model[^.]+\./i
+  );
+
+  const billingModelText = billingSentenceMatch
+    ? billingSentenceMatch[0]
+    : 'Grey Street Legal utilizes a unique and flexible billing model that provides the advantages of a large traditional law firm with those of a dedicated in-house legal staff, without the costs and inefficiencies associated with conventional legal service arrangements.';
+
+  const cleanedOverview = billingSentenceMatch
+    ? overviewParagraph.replace(billingSentenceMatch[0], '').trim()
+    : overviewParagraph;
+
+  const primaryParagraphs = [
+    ...(cleanedOverview ? [cleanedOverview] : []),
+    ...paragraphs.slice(1),
+  ];
 
   return (
     <section className="bg-white py-20 md:py-24">
